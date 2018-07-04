@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
 import CountryMenu from './CountryMenu'
 
 /*
@@ -28,12 +25,6 @@ class App extends Component {
     this.state = {
       error: null,
       isLoaded: false,
-      countries: [],
-      selectedCountry: {
-        code: "",
-        name: ""
-      },
-      cityHint: ""
     };
   };
 

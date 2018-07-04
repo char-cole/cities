@@ -1,11 +1,6 @@
 import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -18,21 +13,25 @@ class CountryMenu extends React.Component {
   state = {
     anchorEl: null,
     error: null,
-    selectedIndex: 0,
     isLoaded: false,
     countryList: [],
-    selectedCountry: {
-      code: this.state.countryList[this.state.selectedIndex].code,
-      name: this.state.countryList[this.state.selectedIndex].name
-    }
+    selectedCountry: []
   };
 
-  handleClick = event => {
+  button = undefined;
+
+  handleClickListItem = event => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
   handleMenuItemClick = (event, index) => {
-  this.setState({ selectedIndex: index, anchorEl: null });
+    const countryListArray = this.state.countryList;
+    console.log(countryListArray[index]);
+    this.setState({
+      selectedCountry: countryListArray[index],
+      anchorEl: null
+    });
+    console.log(this.state.selectedCountry)
 };
 
   handleClose = () => {
@@ -46,11 +45,16 @@ class CountryMenu extends React.Component {
           .then(res => res.json())
           .then(
             (result) => {
-              console.log(result)
+              const tempo = result.map((item) => {
+                return Object.values(item);
+              })
+              console.log(tempo);
               this.setState({
                 isLoaded: true,
-                countryList: result
+                countryList: tempo,
+                selectedCountry: ["Chad", "td"]
               });
+              console.log(this.state.countryList[0])
             },
             // Note: it's important to handle errors here
             // instead of a catch() block so that we don't swallow
@@ -65,7 +69,8 @@ class CountryMenu extends React.Component {
   }
 
   render() {
-    const { anchorEl, error, selectedIndex, isLoaded, countryList, selectedCountry } = this.state;
+    const { anchorEl, error, isLoaded, countryList, selectedCountry } = this.state;
+    console.log(selectedCountry);
     if (error) {
       return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
@@ -78,12 +83,11 @@ class CountryMenu extends React.Component {
               button
               aria-haspopup="true"
               aria-controls="lock-menu"
-              aria-label={this.state.selectedCountry.name}
+              aria-label={selectedCountry[0]}
               onClick={this.handleClickListItem}
             >
               <ListItemText
-                primary={this.state.selectedCountry.name}
-                secondary={countryList[this.state.selectedIndex]}
+                primary={selectedCountry[0]}
               />
             </ListItem>
           </List>
@@ -99,14 +103,15 @@ class CountryMenu extends React.Component {
               },
             }}
           >
-            {countryList.map((option, index) => (
-              <MenuItem
-                key={option}
-                selected={index === this.state.selectedIndex}
-                onClick={event => this.handleMenuItemClick(event, index)}
-              >
-                {option}
-              </MenuItem>
+          {countryList.map((option, index) => (
+            <MenuItem
+              key={option[1]}
+              selected={index === countryList[index]}
+              onClick={event => this.handleMenuItemClick(event, index)}
+            >
+              <div>{option[0]}</div>
+            </MenuItem>
+
             ))}
           </Menu>
         </div>

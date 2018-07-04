@@ -111,7 +111,6 @@ class CountryMenu extends React.Component {
             >
               <div>{option[0]}</div>
             </MenuItem>
-
             ))}
           </Menu>
         </div>

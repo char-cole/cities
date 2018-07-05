@@ -17,24 +17,52 @@ Display next 3 passes of the ISS over chosen city
 Separately, display current ISS coordinates
 */
 
+const battutaKey = "ad3486b7c0cf4595f01223963f58f91a";
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       error: null,
-      isLoaded: false,
-      nextPass: ""
+      listLoaded: false,
+      passLoaded: false,
+      nextPass: "",
+      countryList: [],
     };
   };
 
   componentDidMount() {
+    fetch("http://battuta.medunes.net/api/country/all/?key="+battutaKey)
+          .then(res => res.json())
+          .then(
+            (result) => {
+              const tempArray = result.map((item) => {
+                return Object.values(item);
+              })
+              console.log(tempArray);
+              this.setState({
+                listLoaded: true,
+                countryList: tempArray,
+              });
+              console.log(this.state.countryList[0])
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+              this.setState({
+                listLoaded: true,
+                error
+              });
+            }
+          )
     fetch("http://api.open-notify.org/iss-pass.json?lat=70&lon=100&n=1")
           .then(res => res.json())
           .then(
             (result) => {
               const passDate = new Date(result.response[0].risetime*1000);
               this.setState({
-                isLoaded: true,
+                passLoaded: true,
                 nextPass: passDate.toString()
               });
               console.log("Next pass: "+passDate+" (duration: "+(result.response[0].duration/60).toFixed(2)+" minutes)");
@@ -44,7 +72,7 @@ class App extends Component {
             // exceptions from actual bugs in components.
             (error) => {
               this.setState({
-                isLoaded: true,
+                passLoaded: true,
                 error
               });
             }
@@ -52,16 +80,16 @@ class App extends Component {
   }
 
   render() {
-    const { error, isLoaded } = this.state;
+    const { error, listLoaded, passLoaded, nextPass, countryList } = this.state;
     if (error) {
       return <div>Error: {error.message}</div>;
-    } else if (!isLoaded) {
+    } else if (!listLoaded || !passLoaded) {
       return <div>Loading...</div>;
     } else {
       return (
         <div>
-        <div>{<CountryMenu/>}</div>
-        <div>{<FlyoverCalc city="Beijing" next={this.state.nextPass}/>}</div>
+        <div>{<CountryMenu list={countryList}/>}</div>
+        <div>{<FlyoverCalc city="Beijing" next={nextPass}/>}</div>
         </div>
       );
     }

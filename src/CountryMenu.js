@@ -5,17 +5,13 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
-const battutaKey = "ad3486b7c0cf4595f01223963f58f91a";
-
 const ITEM_HEIGHT = 45;
 
 class CountryMenu extends React.Component {
   state = {
     anchorEl: null,
     error: null,
-    isLoaded: false,
-    countryList: [],
-    selectedCountry: []
+    selectedCountry: ["Chad", "td"]
   };
 
   button = undefined;
@@ -25,10 +21,11 @@ class CountryMenu extends React.Component {
   };
 
   handleMenuItemClick = (event, index) => {
-    const countryListArray = this.state.countryList;
-    console.log(countryListArray[index]);
+    const countryListArray = this.props.list;
+    const listSelect = countryListArray[index]
+    console.log(listSelect);
     this.setState({
-      selectedCountry: countryListArray[index],
+      selectedCountry: listSelect,
       anchorEl: null
     });
     console.log(this.state.selectedCountry)
@@ -41,41 +38,12 @@ class CountryMenu extends React.Component {
   };
 
   componentDidMount() {
-    fetch("http://battuta.medunes.net/api/country/all/?key="+battutaKey)
-          .then(res => res.json())
-          .then(
-            (result) => {
-              const tempo = result.map((item) => {
-                return Object.values(item);
-              })
-              console.log(tempo);
-              this.setState({
-                isLoaded: true,
-                countryList: tempo,
-                selectedCountry: ["Chad", "td"]
-              });
-              console.log(this.state.countryList[0])
-            },
-            // Note: it's important to handle errors here
-            // instead of a catch() block so that we don't swallow
-            // exceptions from actual bugs in components.
-            (error) => {
-              this.setState({
-                isLoaded: true,
-                error
-              });
-            }
-          )
+
   }
 
   render() {
-    const { anchorEl, error, isLoaded, countryList, selectedCountry } = this.state;
-    console.log(selectedCountry);
-    if (error) {
-      return <div>Error: {error.message}</div>;
-    } else if (!isLoaded) {
-      return <div>Loading...</div>;
-    } else {
+    const { anchorEl, error, isLoaded, selectedCountry } = this.state;
+    const countryList = this.props.list
       return (
         <div>
           <List component="nav">
@@ -116,7 +84,6 @@ class CountryMenu extends React.Component {
         </div>
     );
   }
-}
 }
 
 export default CountryMenu;
